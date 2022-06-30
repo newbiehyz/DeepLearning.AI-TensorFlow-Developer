@@ -1,0 +1,19 @@
+·week1
+简单线性函数的tf预测
+
+·week2
+fashion-mnist图片的分类预测
+acc达到95%后暂停训练
+
+·week3
+fashion-MNIST + CNN
+DNN网络结构（conv和Pooling）
+flatten、conv2d、maxpooling后的参数变化
+不同的过滤器，可以使得图像锐化/突出横纵轴的特征
+maxpooling使得图像size变小，并且突出特征
+
+·week4
+ImageDataGenerator:把大量图片split成train和test,rezize,normalize，并且以文件夹名给他们label
+二元class，用sigmoid做激活函数
+用validate数据集测试model，从结果分析模型表现
+提高acc的措施：加cov和maxpooling组合，调整input_size，学习率

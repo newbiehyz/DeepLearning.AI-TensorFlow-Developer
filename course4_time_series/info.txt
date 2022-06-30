@@ -1,0 +1,56 @@
+·week1
+时间序列
+trend, seasonality, noise, autocorrealtion(给定时间步的测量值是先前时间步的函数)
+non-stationary time series
+时间序列的Deep learning不是数据越多越好
+
+naive forecasting, Fixed partitioning:
+把总时间相关数据划分为train,vali,test.
+然后再把test集重新拿来训练，因为test是离现在最近的
+或者：放弃test集，只用train和vali。test集看未来的走向
+
+metircs：用来测试预测结果好坏
+mse：大的error会大蹦，成本过高
+mae：error和收益成正比
+
+统计学预测方法：
+moving average, differencing(比较当前值与past的差)，消noise（添加对过去的预测）
+trailing window当前值，centered window过去值
+
+·week2
+时间序列的window进神经网络
+第一层
+tf.keras.layers.Dense(10, input_shape=[window_size], activation="relu"),
+compile
+model_baseline.compile(loss="mse", optimizer=tf.keras.optimizers.SGD(learning_rate=1e-6, momentum=0.9))
+预测
+forecast.append(model.predict(series[time:time + window_size][np.newaxis]))
+用Callback调节lr
+lr_schedule = tf.keras.callbacks.LearningRateScheduler(
+    lambda epoch: 1e-8 * 10**(epoch / 20))
+之后展示loss和lr的曲线，寻找最稳定的阶段的lr当做正式训练的lr
+
+·week3
+RNN/ LSTM for time series（LSTM属于RNN）
+使用RNN需要三维： [batch, timesteps, feature].所以要在window dataset的二维基础上增添一维
+实现：添加一个Lambda层
+        tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=-1),
+                            input_shape=[window_size]),
+        tf.keras.layers.SimpleRNN(40, return_sequences=True),
+        tf.keras.layers.SimpleRNN(40),
+使用LSTM：比RNN多添加cell state，window中较早的数据对整体投影的影响更大。状态也可以是双向的，以便状态向前和向后移动
+实现：添加一个Lambda层
+        tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=-1),
+                            input_shape=[window_size]),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32, return_sequences=True)),
+        tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
+
+·week4
+Conv1D + Real-world time series data
+Conv1D:  
+  tf.keras.layers.Conv1D(filters=64, kernel_size=3,
+                      strides=1, padding="causal",
+                      activation="relu",
+                      input_shape=[window_size, 1]),
+用sunspot数据，要改window_size，split的尺寸，Dense（根据window_size增大）
+真实数据下，Conv1D+RNN+DNN全用

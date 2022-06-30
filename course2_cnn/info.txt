@@ -1,0 +1,30 @@
+·week1
+猫狗大战数据集
+解压dataset后，以subdirectories区分/train/cats和/train/dogs
+检查所有空文件，list.remove()删除元素
+random.sample取90%的train和test，copyfile至子目录
+2种分类时选择Dense(sigmoid)和loss(binary_crossentropy)
+
+·week2
+image augmentation 图像增广，减少过拟合，提高acc
+train_datagen = ImageDataGenerator(
+      rotation_range=40,
+      width_shift_range=0.2,
+      height_shift_range=0.2,
+      shear_range=0.2,
+      zoom_range=0.2,
+      horizontal_flip=True,
+      fill_mode='nearest')
+
+·week3 
+transfer learning
+使用预训练模型InceptionV3，冻结全连接层权重layers.trainable = False
+替代预训练模型的output
+drop out用来删除随机数量的神经元，因为层中相邻权重互相影响
+
+·week4
+multiclass classification，要改三个地方
+tf.keras.layers.Dense(3, activation='softmax')
+model.compile(loss = 'categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+class_mode='categorical'
+

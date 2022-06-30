@@ -1,0 +1,61 @@
+·week1
+Tokenizer(num_words=) 有多少个独立的单词
+sequence 把一个句子变成index序列，oov把不在token的单词设置成<oov>
+padding：填充，[0 0 0 5 2 1 4] 统一size。 maxlen设置最大句长
+默认Padding在前面，改成post后面是0
+基本流程：
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(text)
+sequences = tokenizer.texts_to_sequences(text)
+padded = pad_sequences(sequences,padding='post')
+
+·week2
+IMDB正面负面评价
+Embeddings map your vocabulary to vectors in higher-dimensional space. 
+Word Embedding，就是把单词组成的句子映射到一个表征向量。
+tf.keras.layers.Embedding(size,embedding_dim,input_length=maxlen)
+model.compile(loss='sparse_categorical_crossentropy'
+
+·week3
+sequence model（Flatten, LSTM, Conv1D, GRU）
+1.Flatten
+model_flatten = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(dense_dim, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+2.把Flatten层换成LSTM层
+单层LSTM:
+model_lstm = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm_dim)),
+    tf.keras.layers.Dense(dense_dim, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+多层LSTM:
+tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm1_dim, return_sequences=True)),
+tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(lstm2_dim))
+
+3.LSTM也可以换成Conv1D+GlobalMaxPooling1D
+tf.keras.layers.Conv1D(128,5,activation='relu')
+tf.keras.layers.GlobalMaxPooling1D()
+
+4.GRU
+model_gru = tf.keras.Sequential([
+    tf.keras.layers.Embedding(vocab_size, embedding_dim, input_length=max_length),
+    tf.keras.layers.Bidirectional(tf.keras.layers.GRU(gru_dim)),
+    tf.keras.layers.Dense(dense_dim, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+·week4
+Sequence models and literature（判断是不是同一个人写的文章，根据语料库生成新的文章句子）
+总的流程：sub每句话，padding,重定义xsys(分割feather和label),onehot，model.predict
+1. n_gram_seqs创建sub-string, n_gram_sequence = token_list[:i+1]
+把一句话裁剪为ABCD--- AB ABC ABCD 最后一个值设为标签
+2. np.array(pad_sequences(input_sequences, maxlen=maxlen, padding='pre'))
+3. features = input_sequences[:,:-1]
+labels = input_sequences[:,-1]
+4. OneHot: tf.keras.utils.to_categorical(labels, num_classes=total_words)
